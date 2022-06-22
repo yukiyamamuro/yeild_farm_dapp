@@ -49,4 +49,51 @@ contract('TokenFarm', ([owner, investor]) => {
             assert.equal(balance.toString(), tokens('1000000'))
         })
     })
+
+    describe('Farming tokens', async () => {
+      it('farming test', async () => {
+        let result
+        result = await mockDaiToken.balanceOf(investor)
+        assert.equal(result.toString(), tokens('100'), 'com')
+
+        await mockDaiToken.approve(tokenFarm.address, tokens('100'), {from: investor})
+        await tokenFarm.stakeTokens(tokens('100'), {from: investor})
+
+        result = await mockDaiToken.balanceOf(investor)
+        assert.equal(result.toString(), tokens('0'), 'com')
+
+        result = await mockDaiToken.balanceOf(tokenFarm.address)
+        assert.equal(result.toString(), tokens('100'), 'com')
+
+        result = await tokenFarm.stakingBalance(investor)
+        assert.equal(result.toString(), tokens('100'), 'com')
+
+        result = await tokenFarm.isStaking(investor)
+        assert.equal(result.toString(), 'true', 'com')
+
+        result = await tokenFarm.hasStaked(investor)
+        assert.equal(result.toString(), 'true', 'com')
+      })
+      it('unfarming test', async () => {
+        await tokenFarm.issueTokens({from: owner})
+          let result
+          result = await yyToken.balanceOf(investor)
+          assert.equal(result.toString(), tokens('100'), 'investor Token wallet balance correct after staking')
+
+          await tokenFarm.issueTokens({from: investor}).should.be.rejected
+          await tokenFarm.unstakeTokens({from: investor})
+
+          result = await mockDaiToken.balanceOf(investor)
+          assert.equal(result.toString(), tokens('100'), 'investor Mock DAI wallet balance correct after staking')
+
+          result = await mockDaiToken.balanceOf(tokenFarm.address)
+          assert.equal(result.toString(), tokens('0'), 'Token Farm Mock DAI balance correct after staking')
+
+          result = await tokenFarm.stakingBalance(investor)
+          assert.equal(result.toString(), tokens('0'), 'investor staking status correct after staking')
+
+          result = await tokenFarm.isStaking(investor)
+          assert.equal(result.toString(), 'false', 'investor staking status correct after staking')
+      })
+    })
 })
