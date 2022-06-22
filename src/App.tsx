@@ -15,17 +15,18 @@ export const App: FC = () => {
   useEffect(()=>{
     const f = async () => {
       const accounts = await web3.eth.getAccounts()
-      console.log('Account: ', accounts[0])
-      setAccount(accounts[0])
+      const currentAccount = accounts[1]
+      console.log('Account: ', currentAccount)
+      setAccount(currentAccount)
 
 
       const mDaiClient = await mockDaiClient(web3);
-      const dai = await mDaiClient.methods.balanceOf(accounts[0]).call()
+      const dai = await mDaiClient.methods.balanceOf(currentAccount).call()
       console.log('MockDai: ', dai)
       setMockDai(dai)
 
       const yyClient = await yyTokenClient(web3);
-      const yy = await yyClient.methods.balanceOf(accounts[0]).call()
+      const yy = await yyClient.methods.balanceOf(currentAccount).call()
       console.log('YYToken: ', yy)
       setYYToken(yy)
     }
@@ -33,18 +34,20 @@ export const App: FC = () => {
   },[])
 
   const handleStakeToken = async()=>{
-    const amount = 100000
+    console.log("STAKE!!!!!!")
+    const amount = 1000000000000
     const mDaiClient = await mockDaiClient(web3);
     const tFarmClient = await tokenFarmClient(web3);
 
-    mDaiClient.methods.approve(TokenFarm.networks[5777].address, amount).send({from: account}).on('transactionHash', (hash) =>{
-      tFarmClient.methods.stakeTokens(amount).send({from: account})
+    mDaiClient.methods.approve(TokenFarm.networks[5777].address, amount).send({from: account, gas: 1000000}).on('transactionHash', (hash) =>{
+      tFarmClient.methods.stakeTokens(amount).send({from: account, gas: 1000000})
     })
   }
 
   const handleUnstakeToken = async () => {
     const tFarmClient = await tokenFarmClient(web3);
-    tFarmClient.methods.unstakeTokens().send({from: account})
+    console.log("UNSTAKE.....")
+    tFarmClient.methods.unstakeTokens().send({from: account, gas: 1000000})
   }
 
   return (

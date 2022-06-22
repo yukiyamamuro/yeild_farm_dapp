@@ -7,14 +7,6 @@ import { TokenFarm as TokenFarmType } from '../types/abi/TokenFarm'
 import Web3 from 'web3'
 import { AbiItem } from 'web3-utils';
 
-declare global{
-  interface Window {
-    ethereum: any;
-    web3: any;
-  }
-}
-
-
 export const tokenFarmClient = async (web3: Web3) => {
   const tokenFarmData = TokenFarm.networks['5777']
   const abi = TokenFarm.abi as any as AbiItem;
